@@ -100,18 +100,15 @@ public class CoinjarAdapters {
   }
 
   public static UserTrade adaptOrderToUserTrade(CoinjarOrder order) {
-    try {
-      return new UserTrade.Builder()
-          .orderId(order.oid.toString())
-          .currencyPair(productToCurrencyPair(order.productId))
-          .type(buySellToOrderType(order.orderType))
-          .price(new BigDecimal(order.price))
-          .originalAmount(new BigDecimal(order.size))
-          .timestamp(DateUtils.fromISODateString(order.timestamp))
-          .build();
-    } catch (InvalidFormatException e) {
-      throw new CoinjarException("adaptOrderToUserTrade cannot parse date " + order.timestamp);
-    }
+    return new UserTrade.Builder()
+        .id(order.oid.toString())
+        .orderId(order.oid.toString())
+        .currencyPair(productToCurrencyPair(order.productId))
+        .type(buySellToOrderType(order.orderSide))
+        .price(new BigDecimal(order.price))
+        .originalAmount(new BigDecimal(order.size))
+        .timestamp(Date.from(ZonedDateTime.parse(order.timestamp).toInstant()))
+        .build();
   }
 
   private static List<LimitOrder> adaptOrderList(
