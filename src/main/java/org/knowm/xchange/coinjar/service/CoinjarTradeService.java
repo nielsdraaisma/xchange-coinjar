@@ -38,7 +38,7 @@ public class CoinjarTradeService extends CoinjarTradeServiceRaw implements Trade
             "GTC");
     CoinjarOrder coinjarOrder = placeOrder(request);
     return coinjarOrder.oid.toString();
-  }
+  };
 
   @Override
   public Collection<Order> getOrder(String... orderIds) throws IOException {
@@ -55,4 +55,11 @@ public class CoinjarTradeService extends CoinjarTradeServiceRaw implements Trade
             .collect(Collectors.toList());
     return new UserTrades(trades, UserTrades.TradeSortType.SortByID);
   }
+
+  @Override
+  public TradeHistoryParams createTradeHistoryParams() {
+    return new CoinjarTradeHistoryParams();
+  }
+
+  public static class CoinjarTradeHistoryParams implements TradeHistoryParams {}
 }
