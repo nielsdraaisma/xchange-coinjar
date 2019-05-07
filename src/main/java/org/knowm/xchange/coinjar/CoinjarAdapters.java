@@ -11,9 +11,8 @@ import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.marketdata.OrderBook;
 import org.knowm.xchange.dto.marketdata.Ticker;
 import org.knowm.xchange.dto.trade.LimitOrder;
+import org.knowm.xchange.dto.trade.UserTrade;
 import org.knowm.xchange.utils.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -23,8 +22,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CoinjarAdapters {
-
-  private static final Logger logger = LoggerFactory.getLogger(CoinjarAdapters.class);
 
   private CoinjarAdapters() {}
 
@@ -58,13 +55,14 @@ public class CoinjarAdapters {
           "Unable to convert orderType " + buySell + " to Order.OrderType");
   }
 
-  public static Order.OrderStatus adaptStatus(String status){
-    if ( status.equals("booked")){
+  public static Order.OrderStatus adaptStatus(String status) {
+    if (status.equals("booked")) {
       return Order.OrderStatus.PENDING_NEW;
-    } else if ( status.equals("filled")){
+    } else if (status.equals("filled")) {
       return Order.OrderStatus.FILLED;
     } else return Order.OrderStatus.UNKNOWN;
   }
+
   public static Ticker adaptTicker(CoinjarTicker ticker, CurrencyPair currencyPair) {
     try {
       return new Ticker.Builder()
@@ -80,26 +78,44 @@ public class CoinjarAdapters {
     }
   }
 
-  public static LimitOrder adaptOrder(CoinjarOrder coinjarOrder) {
+  public static LimitOrder adaptOrderToLimitOrder(CoinjarOrder coinjarOrder) {
     BigDecimal originalAmount = new BigDecimal(coinjarOrder.size);
     BigDecimal filled = new BigDecimal(coinjarOrder.filled);
     BigDecimal remainingAmount = originalAmount.subtract(filled);
     return new LimitOrder.Builder(
             buySellToOrderType(coinjarOrder.orderSide),
             productToCurrencyPair(coinjarOrder.productId))
-            .id(coinjarOrder.oid.toString())
-            .limitPrice(new BigDecimal(coinjarOrder.price))
-            .originalAmount(originalAmount)
-            .remainingAmount(remainingAmount)
-            .cumulativeAmount(filled)
-            .averagePrice(new BigDecimal(coinjarOrder.price))
-            .timestamp(Date.from(ZonedDateTime.parse(coinjarOrder.timestamp, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant()))
-            .orderStatus(adaptStatus(coinjarOrder.status))
-            .build();
+        .id(coinjarOrder.oid.toString())
+        .limitPrice(new BigDecimal(coinjarOrder.price))
+        .originalAmount(originalAmount)
+        .remainingAmount(remainingAmount)
+        .cumulativeAmount(filled)
+        .averagePrice(new BigDecimal(coinjarOrder.price))
+        .timestamp(
+            Date.from(
+                ZonedDateTime.parse(coinjarOrder.timestamp, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                    .toInstant()))
+        .orderStatus(adaptStatus(coinjarOrder.status))
+        .build();
+  }
+
+  public static UserTrade adaptOrderToUserTrade(CoinjarOrder order) {
+    try {
+      return new UserTrade.Builder()
+          .orderId(order.oid.toString())
+          .currencyPair(productToCurrencyPair(order.productId))
+          .type(buySellToOrderType(order.orderType))
+          .price(new BigDecimal(order.price))
+          .originalAmount(new BigDecimal(order.size))
+          .timestamp(DateUtils.fromISODateString(order.timestamp))
+          .build();
+    } catch (InvalidFormatException e) {
+      throw new CoinjarException("adaptOrderToUserTrade cannot parse date " + order.timestamp);
+    }
   }
 
   private static List<LimitOrder> adaptOrderList(
-          List<List<String>> orderList, Order.OrderType orderType, CurrencyPair pair) {
+      List<List<String>> orderList, Order.OrderType orderType, CurrencyPair pair) {
     return orderList.stream()
         .map(
             l ->
@@ -120,51 +136,4 @@ public class CoinjarAdapters {
         adaptOrderList(orderBook.asks, Order.OrderType.ASK, currencyPair),
         adaptOrderList(orderBook.bids, Order.OrderType.BID, currencyPair));
   }
-
-  //  public static List<FundingRecord> adaptFundingRecords(TransferStatus ts) {
-  //    List<FundingRecord> result = new ArrayList<>();
-  //    FundingRecord fundingRecord =
-  //        new FundingRecord(
-  //            ts.getDest().replaceAll("bitcoin:", ""),
-  //            Date.from(Instant.ofEpochSecond(ts.getCreatedAt())),
-  //            Currency.getInstance(ts.getSourceCurrency()),
-  //            ts.getSourceAmount(),
-  //            ts.getId(),
-  //            null,
-  //            FundingRecord.Type.WITHDRAWAL,
-  //            adaptStatusToFundingRecordStatus(ts.getStatus()),
-  //            null,
-  //            ts.getFeeEquivalencies().get(ts.getSourceCurrency()),
-  //            ts.getDesc());
-  //    if (fundingRecord.getStatus() == null) {
-  //      logger.warn("Unable to get FundingRecord status for Wyre transfer status {}",
-  // ts.getStatus());
-  //    }
-  //    result.add(fundingRecord);
-  //    return result;
-  //  }
-  //
-  //  public static List<FundingRecord> adaptFundingRecords(TransferHistoryResponse r) {
-  //    List<FundingRecord> result = new ArrayList<>();
-  //    for (TransferStatus ts : r.getData()) {
-  //      result.addAll(adaptFundingRecords(ts));
-  //    }
-  //    return result;
-  //  }
-  //
-  //  public static Order adaptTransferStatus(TransferStatus transferStatus) {
-  //    CurrencyPair pair =
-  //        new CurrencyPair(transferStatus.getSourceCurrency(), transferStatus.getDestCurrency());
-  //    return new LimitOrder(
-  //        null,
-  //        transferStatus.getSourceAmount(),
-  //        pair,
-  //        transferStatus.getId(),
-  //        new Date(transferStatus.getCreatedAt()),
-  //        transferStatus.getExchangeRate(),
-  //        transferStatus.getExchangeRate(),
-  //        transferStatus.getDestAmount(),
-  //        transferStatus.getTotalFees(),
-  //        adaptOrderStatus(adaptStatusToFundingRecordStatus(transferStatus.getStatus())));
-  //  }
 }

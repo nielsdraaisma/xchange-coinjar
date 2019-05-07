@@ -28,11 +28,16 @@ public interface CoinjarTrading {
   @Path("/orders")
   @Consumes(MediaType.APPLICATION_JSON)
   CoinjarOrder placeOrder(
-          @HeaderParam("Authorization") String authHeader, CoinjarOrderRequest request)
+      @HeaderParam("Authorization") String authHeader, CoinjarOrderRequest request)
+      throws CoinjarException, IOException;
+
+  @GET
+  @Path("/orders/all")
+  List<CoinjarOrder> getAllOrders(@HeaderParam("Authorization") String authHeader)
       throws CoinjarException, IOException;
 
   @GET
   @Path(("/orders/{id}"))
-  CoinjarOrder getOrder(@HeaderParam("Authorization") String authHeader, @PathParam("id") String id);
-
+  CoinjarOrder getOrder(
+      @HeaderParam("Authorization") String authHeader, @PathParam("id") String id);
 }
