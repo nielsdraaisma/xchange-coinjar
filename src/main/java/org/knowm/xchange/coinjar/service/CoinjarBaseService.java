@@ -7,8 +7,6 @@ import org.knowm.xchange.service.BaseExchangeService;
 import org.knowm.xchange.service.BaseService;
 import si.mazi.rescu.RestProxyFactory;
 
-import java.util.Optional;
-
 public class CoinjarBaseService extends BaseExchangeService implements BaseService {
 
   public static final String LIVE_URL = "https://exchange.coinjar.com/";
@@ -23,10 +21,14 @@ public class CoinjarBaseService extends BaseExchangeService implements BaseServi
     super(exchange);
     String domain;
     // Take url from either sslUri or host, fall back to live if not set
-    String url =
-        Optional.ofNullable(exchange.getExchangeSpecification().getSslUri())
-            .or(() -> Optional.ofNullable(exchange.getExchangeSpecification().getHost()))
-            .orElse(LIVE_URL);
+    String url;
+    if ( exchange.getExchangeSpecification().getSslUri() != null){
+      url = exchange.getExchangeSpecification().getSslUri();
+    } else if (exchange.getExchangeSpecification().getHost() != null){
+      url = exchange.getExchangeSpecification().getHost();
+    } else {
+      url = LIVE_URL;
+    }
 
     this.authorizationHeader =
         "Token token=\"" + exchange.getExchangeSpecification().getApiKey() + "\"";
