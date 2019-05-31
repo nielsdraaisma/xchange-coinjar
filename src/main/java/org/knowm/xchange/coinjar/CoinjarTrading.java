@@ -37,7 +37,12 @@ public interface CoinjarTrading {
       throws CoinjarException, IOException;
 
   @GET
-  @Path(("/orders/{id}"))
+  @Path("/orders/{id}")
   CoinjarOrder getOrder(
+      @HeaderParam("Authorization") String authHeader, @PathParam("id") String id);
+
+  @DELETE
+  @Path("/orders/{id}")
+  CoinjarOrder cancelOrder(
       @HeaderParam("Authorization") String authHeader, @PathParam("id") String id);
 }

@@ -9,6 +9,8 @@ import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.UserTrade;
 import org.knowm.xchange.dto.trade.UserTrades;
 import org.knowm.xchange.service.trade.TradeService;
+import org.knowm.xchange.service.trade.params.CancelOrderByIdParams;
+import org.knowm.xchange.service.trade.params.CancelOrderParams;
 import org.knowm.xchange.service.trade.params.TradeHistoryParams;
 
 import java.io.IOException;
@@ -61,5 +63,18 @@ public class CoinjarTradeService extends CoinjarTradeServiceRaw implements Trade
     return new CoinjarTradeHistoryParams();
   }
 
-  public static class CoinjarTradeHistoryParams implements TradeHistoryParams {}
+
+  @Override
+  public boolean cancelOrder(CancelOrderParams orderParams) {
+    if (orderParams instanceof CancelOrderByIdParams) {
+      CoinjarOrder cancelledOrder =
+          cancelOrderById(((CancelOrderByIdParams) orderParams).getOrderId());
+      return cancelledOrder.status == "cancelled";
+    } else {
+      throw new IllegalArgumentException(
+          "Unable to extract id from CancelOrderParams" + orderParams);
+    }
+  }
+
+  private static class CoinjarTradeHistoryParams implements TradeHistoryParams {}
 }

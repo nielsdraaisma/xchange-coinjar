@@ -25,4 +25,8 @@ class CoinjarTradeServiceRaw extends CoinjarBaseService {
   protected List<CoinjarOrder> getAllOrders() throws CoinjarException, IOException {
     return coinjarTrading.getAllOrders(authorizationHeader);
   }
+
+  protected CoinjarOrder cancelOrderById(String id) throws CoinjarException {
+    return coinjarTrading.cancelOrder(authorizationHeader, id);
+  }
 }
