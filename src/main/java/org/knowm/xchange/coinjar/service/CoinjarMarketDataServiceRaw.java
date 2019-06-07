@@ -1,6 +1,7 @@
 package org.knowm.xchange.coinjar.service;
 
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.coinjar.CoinjarException;
 import org.knowm.xchange.coinjar.dto.data.CoinjarOrderBook;
 import org.knowm.xchange.coinjar.dto.data.CoinjarTicker;
 

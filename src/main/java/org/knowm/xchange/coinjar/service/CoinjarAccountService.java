@@ -1,5 +1,7 @@
 package org.knowm.xchange.coinjar.service;
 
+import org.knowm.xchange.coinjar.CoinjarErrorAdapter;
+import org.knowm.xchange.coinjar.CoinjarException;
 import org.knowm.xchange.coinjar.CoinjarExchange;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.dto.account.AccountInfo;
@@ -20,17 +22,21 @@ public class CoinjarAccountService extends CoinjarAccountServiceRaw implements A
 
   @Override
   public AccountInfo getAccountInfo() throws IOException {
-    List<Wallet> wallets =
-        getAccounts().stream()
-            .map(
-                wallet ->
-                    new Wallet(
-                        wallet.number,
-                        new Balance(
-                            Currency.getInstance(wallet.assetCode),
-                            new BigDecimal(wallet.balance),
-                            new BigDecimal(wallet.available))))
-            .collect(Collectors.toList());
-    return new AccountInfo(wallets);
+    try {
+      List<Wallet> wallets =
+          getAccounts().stream()
+              .map(
+                  wallet ->
+                      new Wallet(
+                          wallet.number,
+                          new Balance(
+                              Currency.getInstance(wallet.assetCode),
+                              new BigDecimal(wallet.balance),
+                              new BigDecimal(wallet.available))))
+              .collect(Collectors.toList());
+      return new AccountInfo(wallets);
+    } catch (CoinjarException e) {
+      throw CoinjarErrorAdapter.adaptCoinjarException(e);
+    }
   }
 }

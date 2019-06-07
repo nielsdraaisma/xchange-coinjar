@@ -4,7 +4,6 @@ import org.knowm.xchange.coinjar.dto.CoinjarOrder;
 import org.knowm.xchange.coinjar.dto.trading.CoinjarAccount;
 import org.knowm.xchange.coinjar.dto.trading.CoinjarOrderRequest;
 import org.knowm.xchange.coinjar.dto.trading.CoinjarProduct;
-import org.knowm.xchange.coinjar.service.CoinjarException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -28,7 +27,7 @@ public interface CoinjarTrading {
   @Path("/orders")
   @Consumes(MediaType.APPLICATION_JSON)
   CoinjarOrder placeOrder(
-          @HeaderParam("Authorization") String authHeader, CoinjarOrderRequest request)
+      @HeaderParam("Authorization") String authHeader, CoinjarOrderRequest request)
       throws CoinjarException, IOException;
 
   @GET
@@ -38,11 +37,12 @@ public interface CoinjarTrading {
 
   @GET
   @Path("/orders/{id}")
-  CoinjarOrder getOrder(
-          @HeaderParam("Authorization") String authHeader, @PathParam("id") String id);
+  CoinjarOrder getOrder(@HeaderParam("Authorization") String authHeader, @PathParam("id") String id)
+      throws CoinjarException, IOException;
 
   @DELETE
   @Path("/orders/{id}")
   CoinjarOrder cancelOrder(
-          @HeaderParam("Authorization") String authHeader, @PathParam("id") String id);
+      @HeaderParam("Authorization") String authHeader, @PathParam("id") String id)
+      throws CoinjarException, IOException;
 }

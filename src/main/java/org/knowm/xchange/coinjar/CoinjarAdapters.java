@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.knowm.xchange.coinjar.dto.CoinjarOrder;
 import org.knowm.xchange.coinjar.dto.data.CoinjarOrderBook;
 import org.knowm.xchange.coinjar.dto.data.CoinjarTicker;
-import org.knowm.xchange.coinjar.service.CoinjarException;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
@@ -20,6 +19,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,7 +72,8 @@ public class CoinjarAdapters {
     }
   }
 
-  public static Ticker adaptTicker(CoinjarTicker ticker, CurrencyPair currencyPair) {
+  public static Ticker adaptTicker(CoinjarTicker ticker, CurrencyPair currencyPair)
+      throws CoinjarException {
     try {
       return new Ticker.Builder()
           .currencyPair(currencyPair)
@@ -83,7 +84,8 @@ public class CoinjarAdapters {
           .volume(new BigDecimal(ticker.volume))
           .build();
     } catch (InvalidFormatException e) {
-      throw new CoinjarException("adaptTicker cannot parse date " + ticker.currentTime);
+      throw new CoinjarException(
+          "adaptTicker cannot parse date " + ticker.currentTime, Collections.emptyList());
     }
   }
 

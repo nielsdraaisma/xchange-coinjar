@@ -1,6 +1,8 @@
 package org.knowm.xchange.coinjar.service;
 
 import org.knowm.xchange.coinjar.CoinjarAdapters;
+import org.knowm.xchange.coinjar.CoinjarErrorAdapter;
+import org.knowm.xchange.coinjar.CoinjarException;
 import org.knowm.xchange.coinjar.CoinjarExchange;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.marketdata.OrderBook;
@@ -24,25 +26,37 @@ public class CoinjarMarketDataService extends CoinjarMarketDataServiceRaw
 
   @Override
   public Ticker getTicker(CurrencyPair currencyPair, Object... args) throws IOException {
-    return CoinjarAdapters.adaptTicker(
-        super.getTicker(currencyPairToProduct(currencyPair)), currencyPair);
+    try {
+      return CoinjarAdapters.adaptTicker(
+          super.getTicker(currencyPairToProduct(currencyPair)), currencyPair);
+    } catch (CoinjarException e) {
+      throw CoinjarErrorAdapter.adaptCoinjarException(e);
+    }
   }
 
   @Override
   public List<Ticker> getTickers(Params params) throws IOException {
-    List<Ticker> res = new ArrayList<>();
-    if (params instanceof CurrencyPairsParam) {
-      for (CurrencyPair cp : ((CurrencyPairsParam) params).getCurrencyPairs()) {
-        res.add(getTicker(cp));
+    try {
+      List<Ticker> res = new ArrayList<>();
+      if (params instanceof CurrencyPairsParam) {
+        for (CurrencyPair cp : ((CurrencyPairsParam) params).getCurrencyPairs()) {
+          res.add(getTicker(cp));
+        }
+        return res;
       }
       return res;
+    } catch (CoinjarException e) {
+      throw CoinjarErrorAdapter.adaptCoinjarException(e);
     }
-    return res;
   }
 
   @Override
   public OrderBook getOrderBook(CurrencyPair currencyPair, Object... args) throws IOException {
-    return CoinjarAdapters.adaptOrderbook(
-        super.getOrderBook(currencyPairToProduct(currencyPair)), currencyPair);
+    try {
+      return CoinjarAdapters.adaptOrderbook(
+          super.getOrderBook(currencyPairToProduct(currencyPair)), currencyPair);
+    } catch (CoinjarException e) {
+      throw CoinjarErrorAdapter.adaptCoinjarException(e);
+    }
   }
 }

@@ -1,6 +1,7 @@
 package org.knowm.xchange.coinjar.service;
 
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.coinjar.CoinjarException;
 import org.knowm.xchange.coinjar.dto.CoinjarOrder;
 import org.knowm.xchange.coinjar.dto.trading.CoinjarOrderRequest;
 
@@ -26,7 +27,7 @@ class CoinjarTradeServiceRaw extends CoinjarBaseService {
     return coinjarTrading.getAllOrders(authorizationHeader);
   }
 
-  protected CoinjarOrder cancelOrderById(String id) throws CoinjarException {
+  protected CoinjarOrder cancelOrderById(String id) throws CoinjarException, IOException {
     return coinjarTrading.cancelOrder(authorizationHeader, id);
   }
 }

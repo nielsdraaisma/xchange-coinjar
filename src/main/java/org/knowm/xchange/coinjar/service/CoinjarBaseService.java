@@ -22,9 +22,9 @@ public class CoinjarBaseService extends BaseExchangeService implements BaseServi
     String domain;
     // Take url from either sslUri or host, fall back to live if not set
     String url;
-    if ( exchange.getExchangeSpecification().getSslUri() != null){
+    if (exchange.getExchangeSpecification().getSslUri() != null) {
       url = exchange.getExchangeSpecification().getSslUri();
-    } else if (exchange.getExchangeSpecification().getHost() != null){
+    } else if (exchange.getExchangeSpecification().getHost() != null) {
       url = exchange.getExchangeSpecification().getHost();
     } else {
       url = LIVE_URL;
@@ -54,17 +54,4 @@ public class CoinjarBaseService extends BaseExchangeService implements BaseServi
         RestProxyFactory.createProxy(
             CoinjarTrading.class, "https://api.exchange." + domain + ".com/", getClientConfig());
   }
-
-  //  protected ExchangeException handleError(CoinjarException exception) {
-  //
-  //    if (exception.getMessage().contains("Insufficient")) {
-  //      return new FundsExceededException(exception);
-  //    } else if (exception.getMessage().contains("Rate limit exceeded")) {
-  //      return new RateLimitExceededException(exception);
-  //    } else if (exception.getMessage().contains("Internal server error")) {
-  //      return new InternalServerException(exception);
-  //    } else {
-  //      return new ExchangeException(exception);
-  //    }
-  //  }
 }

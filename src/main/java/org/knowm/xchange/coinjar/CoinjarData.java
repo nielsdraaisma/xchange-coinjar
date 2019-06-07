@@ -2,7 +2,6 @@ package org.knowm.xchange.coinjar;
 
 import org.knowm.xchange.coinjar.dto.data.CoinjarOrderBook;
 import org.knowm.xchange.coinjar.dto.data.CoinjarTicker;
-import org.knowm.xchange.coinjar.service.CoinjarException;
 
 import javax.ws.rs.*;
 import java.io.IOException;
