@@ -28,7 +28,7 @@ public interface CoinjarTrading {
   @Path("/orders")
   @Consumes(MediaType.APPLICATION_JSON)
   CoinjarOrder placeOrder(
-      @HeaderParam("Authorization") String authHeader, CoinjarOrderRequest request)
+          @HeaderParam("Authorization") String authHeader, CoinjarOrderRequest request)
       throws CoinjarException, IOException;
 
   @GET
@@ -39,10 +39,10 @@ public interface CoinjarTrading {
   @GET
   @Path("/orders/{id}")
   CoinjarOrder getOrder(
-      @HeaderParam("Authorization") String authHeader, @PathParam("id") String id);
+          @HeaderParam("Authorization") String authHeader, @PathParam("id") String id);
 
   @DELETE
   @Path("/orders/{id}")
   CoinjarOrder cancelOrder(
-      @HeaderParam("Authorization") String authHeader, @PathParam("id") String id);
+          @HeaderParam("Authorization") String authHeader, @PathParam("id") String id);
 }

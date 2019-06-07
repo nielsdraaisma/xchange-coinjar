@@ -13,6 +13,8 @@ import org.knowm.xchange.dto.marketdata.Ticker;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.UserTrade;
 import org.knowm.xchange.utils.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -22,6 +24,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CoinjarAdapters {
+
+  private static final Logger logger = LoggerFactory.getLogger(CoinjarAdapters.class);
 
   private CoinjarAdapters() {}
 
@@ -60,7 +64,12 @@ public class CoinjarAdapters {
       return Order.OrderStatus.PENDING_NEW;
     } else if (status.equals("filled")) {
       return Order.OrderStatus.FILLED;
-    } else return Order.OrderStatus.UNKNOWN;
+    } else if (status.equals("cancelled")) {
+      return Order.OrderStatus.CANCELED;
+    } else {
+      logger.warn("Unable to convert remote status {} to Order.OrderStatus", status);
+      return Order.OrderStatus.UNKNOWN;
+    }
   }
 
   public static Ticker adaptTicker(CoinjarTicker ticker, CurrencyPair currencyPair) {
@@ -81,7 +90,14 @@ public class CoinjarAdapters {
   public static LimitOrder adaptOrderToLimitOrder(CoinjarOrder coinjarOrder) {
     BigDecimal originalAmount = new BigDecimal(coinjarOrder.size);
     BigDecimal filled = new BigDecimal(coinjarOrder.filled);
+    Boolean isFilled = filled.compareTo(BigDecimal.ZERO) > 0;
     BigDecimal remainingAmount = originalAmount.subtract(filled);
+    Order.OrderStatus orderStatus = adaptStatus(coinjarOrder.status);
+    if (orderStatus == Order.OrderStatus.PENDING_NEW && isFilled) {
+      orderStatus = Order.OrderStatus.PARTIALLY_FILLED;
+    } else if (orderStatus == Order.OrderStatus.CANCELED && isFilled) {
+      orderStatus = Order.OrderStatus.PARTIALLY_CANCELED;
+    }
     return new LimitOrder.Builder(
             buySellToOrderType(coinjarOrder.orderSide),
             productToCurrencyPair(coinjarOrder.productId))
@@ -95,7 +111,7 @@ public class CoinjarAdapters {
             Date.from(
                 ZonedDateTime.parse(coinjarOrder.timestamp, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
                     .toInstant()))
-        .orderStatus(adaptStatus(coinjarOrder.status))
+        .orderStatus(orderStatus)
         .build();
   }
 
