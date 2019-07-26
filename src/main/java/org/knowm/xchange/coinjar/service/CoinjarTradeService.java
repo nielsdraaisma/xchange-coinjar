@@ -69,8 +69,9 @@ public class CoinjarTradeService extends CoinjarTradeServiceRaw implements Trade
     }
     try {
       List<UserTrade> trades =
-          getAllOrders(page).stream()
-              .map(CoinjarAdapters::adaptOrderToUserTrade)
+              getFills(page, null, null)
+              .stream()
+              .map(CoinjarAdapters::adaptFillToUserTrade)
               .collect(Collectors.toList());
       return new UserTrades(trades, UserTrades.TradeSortType.SortByID);
     } catch (CoinjarException e) {

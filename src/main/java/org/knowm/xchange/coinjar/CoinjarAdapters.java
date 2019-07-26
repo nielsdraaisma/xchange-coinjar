@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.knowm.xchange.coinjar.dto.CoinjarOrder;
 import org.knowm.xchange.coinjar.dto.data.CoinjarOrderBook;
 import org.knowm.xchange.coinjar.dto.data.CoinjarTicker;
+import org.knowm.xchange.coinjar.dto.trading.CoinjarFill;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
@@ -150,5 +151,17 @@ public class CoinjarAdapters {
         null,
         adaptOrderList(orderBook.asks, Order.OrderType.ASK, currencyPair),
         adaptOrderList(orderBook.bids, Order.OrderType.BID, currencyPair));
+  }
+
+  public static UserTrade adaptFillToUserTrade(CoinjarFill coinjarFill) {
+    return new UserTrade.Builder()
+        .id(coinjarFill.tid.toString())
+        .orderId(coinjarFill.oid.toString())
+        .currencyPair(productToCurrencyPair(coinjarFill.productId))
+        .type(buySellToOrderType(coinjarFill.side))
+        .price(new BigDecimal(coinjarFill.price))
+        .originalAmount(new BigDecimal(coinjarFill.size))
+        .timestamp(Date.from(ZonedDateTime.parse(coinjarFill.timestamp).toInstant()))
+        .build();
   }
 }

@@ -45,7 +45,7 @@ public interface CoinjarTrading {
   @Path("/fills")
   List<CoinjarFill> getFills(
       @HeaderParam("Authorization") String authHeader,
-      @QueryParam("cursor") Long cursor,
+      @QueryParam("cursor") Integer cursor,
       @QueryParam("product_id") String productId,
       @QueryParam("oid") String oid)
       throws CoinjarException, IOException;

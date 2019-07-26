@@ -32,7 +32,7 @@ class CoinjarTradeServiceRaw extends CoinjarBaseService {
     return coinjarTrading.cancelOrder(authorizationHeader, id);
   }
 
-  protected List<CoinjarFill> getFills(Long cursor, String productId, String oid)
+  protected List<CoinjarFill> getFills(Integer cursor, String productId, String oid)
       throws CoinjarException, IOException {
     return coinjarTrading.getFills(authorizationHeader, cursor, productId, oid);
   }
