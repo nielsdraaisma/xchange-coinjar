@@ -10,9 +10,11 @@ import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.UserTrade;
 import org.knowm.xchange.dto.trade.UserTrades;
+import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.service.trade.TradeService;
 import org.knowm.xchange.service.trade.params.CancelOrderByIdParams;
 import org.knowm.xchange.service.trade.params.CancelOrderParams;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamPaging;
 import org.knowm.xchange.service.trade.params.TradeHistoryParams;
 
 import java.io.IOException;
@@ -61,9 +63,13 @@ public class CoinjarTradeService extends CoinjarTradeServiceRaw implements Trade
 
   @Override
   public UserTrades getTradeHistory(TradeHistoryParams params) throws IOException {
+    Integer page = 0;
+    if (params instanceof CoinjarTradeHistoryParams) {
+      page = ((CoinjarTradeHistoryParams) params).page;
+    }
     try {
       List<UserTrade> trades =
-          getAllOrders().stream()
+          getAllOrders(page).stream()
               .map(CoinjarAdapters::adaptOrderToUserTrade)
               .collect(Collectors.toList());
       return new UserTrades(trades, UserTrades.TradeSortType.SortByID);
@@ -93,5 +99,28 @@ public class CoinjarTradeService extends CoinjarTradeServiceRaw implements Trade
     }
   }
 
-  private static class CoinjarTradeHistoryParams implements TradeHistoryParams {}
+  private static class CoinjarTradeHistoryParams
+      implements TradeHistoryParams, TradeHistoryParamPaging {
+    private Integer page;
+
+    @Override
+    public Integer getPageLength() {
+      return null;
+    }
+
+    @Override
+    public void setPageLength(Integer pageLength) {
+      throw new NotAvailableFromExchangeException();
+    }
+
+    @Override
+    public Integer getPageNumber() {
+      return null;
+    }
+
+    @Override
+    public void setPageNumber(Integer pageNumber) {
+      page = pageNumber;
+    }
+  }
 }

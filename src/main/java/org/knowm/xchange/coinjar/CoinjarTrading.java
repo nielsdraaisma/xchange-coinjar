@@ -2,6 +2,7 @@ package org.knowm.xchange.coinjar;
 
 import org.knowm.xchange.coinjar.dto.CoinjarOrder;
 import org.knowm.xchange.coinjar.dto.trading.CoinjarAccount;
+import org.knowm.xchange.coinjar.dto.trading.CoinjarFill;
 import org.knowm.xchange.coinjar.dto.trading.CoinjarOrderRequest;
 import org.knowm.xchange.coinjar.dto.trading.CoinjarProduct;
 
@@ -32,12 +33,21 @@ public interface CoinjarTrading {
 
   @GET
   @Path("/orders/all")
-  List<CoinjarOrder> getAllOrders(@HeaderParam("Authorization") String authHeader)
+  List<CoinjarOrder> getAllOrders(@HeaderParam("Authorization") String authHeader, @QueryParam("cursor") Integer cursor)
       throws CoinjarException, IOException;
 
   @GET
   @Path("/orders/{id}")
   CoinjarOrder getOrder(@HeaderParam("Authorization") String authHeader, @PathParam("id") String id)
+      throws CoinjarException, IOException;
+
+  @GET
+  @Path("/fills")
+  List<CoinjarFill> getFills(
+      @HeaderParam("Authorization") String authHeader,
+      @QueryParam("cursor") Long cursor,
+      @QueryParam("product_id") String productId,
+      @QueryParam("oid") String oid)
       throws CoinjarException, IOException;
 
   @DELETE
