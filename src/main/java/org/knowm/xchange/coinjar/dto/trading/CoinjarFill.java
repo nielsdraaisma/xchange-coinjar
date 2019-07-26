@@ -20,8 +20,8 @@ public class CoinjarFill {
       @JsonProperty("oid") Long oid,
       @JsonProperty("price") String price,
       @JsonProperty("product_id") String productId,
-      @JsonProperty("size") String side,
-      @JsonProperty("side") String size,
+      @JsonProperty("side") String side,
+      @JsonProperty("size") String size,
       @JsonProperty("tid") Long tid,
       @JsonProperty("timestamp") String timestamp,
       @JsonProperty("value") String value) {
