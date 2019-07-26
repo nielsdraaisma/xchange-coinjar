@@ -65,7 +65,7 @@ public class CoinjarTradeService extends CoinjarTradeServiceRaw implements Trade
   public UserTrades getTradeHistory(TradeHistoryParams params) throws IOException {
     Integer page = 0;
     if (params instanceof CoinjarTradeHistoryParams) {
-      page = ((CoinjarTradeHistoryParams) params).page;
+      page = ((CoinjarTradeHistoryParams) params).pageNumber;
     }
     try {
       List<UserTrade> trades =
@@ -101,7 +101,7 @@ public class CoinjarTradeService extends CoinjarTradeServiceRaw implements Trade
 
   private static class CoinjarTradeHistoryParams
       implements TradeHistoryParams, TradeHistoryParamPaging {
-    private Integer page;
+    private Integer pageNumber;
 
     @Override
     public Integer getPageLength() {
@@ -115,12 +115,12 @@ public class CoinjarTradeService extends CoinjarTradeServiceRaw implements Trade
 
     @Override
     public Integer getPageNumber() {
-      return null;
+      return pageNumber;
     }
 
     @Override
     public void setPageNumber(Integer pageNumber) {
-      page = pageNumber;
+      this.pageNumber = pageNumber;
     }
   }
 }
